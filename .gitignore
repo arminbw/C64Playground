@@ -1,0 +1,12 @@
+*.swp
+*~
+*.log
+.DS_Store
+
+*.dbg
+*.prg
+*.sym
+*.vs
+
+bin
+
