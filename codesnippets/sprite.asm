@@ -27,4 +27,4 @@ main:
   rts
 
 *=$2000
-.import binary "assets/sprite.bin"
+.import binary "../assets/sprite.bin"
