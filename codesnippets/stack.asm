@@ -19,7 +19,6 @@ main:
   ldx #1
   ldy #0
 
-  // just testing..
   drawLoop:
     txa // copy x to accumulator
     pha // push accumulator to stack
