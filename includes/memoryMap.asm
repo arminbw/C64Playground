@@ -2,6 +2,7 @@
 .label GAME_CODE_ADDRESS    = $0810
 .label VARIABLES_ADDRESS    = $0c00
 .label TABLES_ADDRESS       = $4000
+.label LIBRARIES_ADDRESS		= $5000
 
 // zero page constants
 .label ZP_ROW_LO            = ZERO_PAGE_ADDRESS

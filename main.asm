@@ -1,12 +1,13 @@
-#import "includes/memorymap.asm"
+#import "includes/memoryMap.asm"
 
 BasicUpstart2(main)
 
-*=TABLES_ADDRESS "Tables"
-#import "includes/tables.asm"
-
 *=GAME_CODE_ADDRESS "Game Code"
 #import "includes/gameCode.asm"
+
+*=LIBRARIES_ADDRESS "Libraries"
+#import "includes/interruptLibrary.asm"
+#import "includes/characterLibrary.asm"
 
 // *=VARIABLES_ADDRESS "Variables"
 // import "includes/variables.asm"

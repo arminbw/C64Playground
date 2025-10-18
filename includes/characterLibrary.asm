@@ -1,4 +1,3 @@
-
 Row_LO:
 .byte <(SCREEN_RAM + (SCREEN_WIDTH * 0))
 .byte <(SCREEN_RAM + (SCREEN_WIDTH * 1))
@@ -107,4 +106,67 @@ Row_Color_HI:
 .byte >(SCREEN_COLOR_RAM + (SCREEN_WIDTH * 23))
 .byte >(SCREEN_COLOR_RAM + (SCREEN_WIDTH * 24))
 
+charNr: .byte 0
+charRow: .byte 0
+charCol: .byte 0
+charColor: .byte 0
+charCounter: .byte 0
 
+.macro DrawChar(char,row,col,color)
+{
+  // store everything into the char variables
+	lda #char
+	sta charNr
+	lda #row
+	sta charRow
+	lda #col
+	sta charCol
+	lda #color
+	sta charColor
+  // now call the subroutine
+	jsr CHARACTER.drawChar
+}
+
+CHARACTER:
+{
+	drawChar:
+    // preserve x and y
+		txa
+		pha
+		tya
+		pha
+
+		ldx charRow
+	
+    // we use indirect-indexed addressing and the tables (Row_LO etc.) defined above
+    // to construct the correct address for the screen memory
+    // we store this address in zero page memory
+		lda Row_LO,x
+		sta ZP_ROW_LO
+		lda Row_HI,x
+		sta ZP_ROW_HI
+		lda Row_Color_LO,x
+		sta ZP_ROW_COLOR_LO
+		lda Row_Color_HI,x
+		sta ZP_ROW_COLOR_HI
+
+		ldy charCol
+
+		lda charNr
+		sta (ZP_ROW_LO),y
+
+		lda charColor
+		sta (ZP_ROW_COLOR_LO),y
+
+    // get x and y back from the stack
+		pla
+		tay
+		pla
+		tax
+		rts
+
+  updateCharacter_X_Y:
+    // do stuff
+    DrawChar(2,5,7,1)
+    rts
+}
