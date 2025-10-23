@@ -12,7 +12,6 @@ BasicUpstart2(main)
 // *=VARIABLES_ADDRESS "Variables"
 // import "includes/variables.asm"
 
-
 // *=TILESET_ADDRESS "Tileset"
 // .import binary "assets/tileset.bin"
 

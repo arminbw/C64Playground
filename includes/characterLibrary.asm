@@ -1,3 +1,10 @@
+// The screen is stored at $0400-$07E7 for screen codes and $D800-$DBE7 for color.
+// Each character cell is addressed by row and column, so we need a way to compute 
+// the screen memory address from (row, col).
+// ZP_ROW_LO/HI point to the memory for the start of the row.
+// ZP_ROW_COLOR_LO/HI point to the color RAM for that row.
+
+// Y offset selects the column.
 Row_LO:
 .byte <(SCREEN_RAM + (SCREEN_WIDTH * 0))
 .byte <(SCREEN_RAM + (SCREEN_WIDTH * 1))
@@ -106,11 +113,11 @@ Row_Color_HI:
 .byte >(SCREEN_COLOR_RAM + (SCREEN_WIDTH * 23))
 .byte >(SCREEN_COLOR_RAM + (SCREEN_WIDTH * 24))
 
-charNr: .byte 0
+charNr: .byte 1
 charRow: .byte 0
 charCol: .byte 0
-charColor: .byte 0
-charCounter: .byte 0
+charColor: .byte 1
+charDirCol: .byte 1
 
 .macro DrawChar(char,row,col,color)
 {
@@ -125,6 +132,49 @@ charCounter: .byte 0
 	sta charColor
   // now call the subroutine
 	jsr CHARACTER.drawChar
+}
+
+.macro UpdateBall(ballCol,ballRow,ballDirCol,ballDirRow,ballColor,charCode)
+{
+    // remove current character
+    adc #1
+    sta charCode
+    jsr CHARACTER.drawChar
+
+    lda ballCol
+    clc
+    adc ballDirCol
+    cmp #SCREEN_WIDTH-1
+    bcc @noBounceX
+    lda ballDirCol
+    eor #$FF
+    adc #1
+    sta ballDirCol
+@noBounceX:
+    sta ballCol
+
+    lda ballRow
+    clc
+    adc ballDirRow
+    cmp #SCREEN_HEIGHT-1
+    bcc @noBounceY
+    lda ballDirRow
+    eor #$FF
+    adc #1
+    sta ballDirRow
+@noBounceY:
+    sta ballRow
+
+    // draw using DrawChar macro
+    lda ballCol
+    sta charCol
+    lda ballRow
+    sta charRow
+    lda charCode
+    sta charNr
+    lda ballColor
+    sta charColor
+    jsr CHARACTER.drawChar
 }
 
 CHARACTER:
@@ -164,9 +214,4 @@ CHARACTER:
 		pla
 		tax
 		rts
-
-  updateCharacter_X_Y:
-    // do stuff
-    DrawChar(2,5,7,1)
-    rts
 }
