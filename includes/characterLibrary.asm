@@ -117,7 +117,7 @@ charNr: .byte 1
 charRow: .byte 0
 charCol: .byte 0
 charColor: .byte 1
-charDirCol: .byte 1
+charDirCol: .byte 0
 
 .macro DrawChar(char,row,col,color)
 {
@@ -134,46 +134,48 @@ charDirCol: .byte 1
 	jsr CHARACTER.drawChar
 }
 
-.macro UpdateBall(ballCol,ballRow,ballDirCol,ballDirRow,ballColor,charCode)
+.macro UpdateBall(ballCol,ballRow,ballDirCol,ballDirRow,ballColor)
 {
     // remove current character
-    adc #1
-    sta charCode
+    lda #1
+    sta charNr
     jsr CHARACTER.drawChar
 
-    lda ballCol
-    clc
-    adc ballDirCol
-    cmp #SCREEN_WIDTH-1
-    bcc @noBounceX
     lda ballDirCol
-    eor #$FF
-    adc #1
-    sta ballDirCol
-@noBounceX:
-    sta ballCol
-
-    lda ballRow
-    clc
-    adc ballDirRow
-    cmp #SCREEN_HEIGHT-1
-    bcc @noBounceY
-    lda ballDirRow
-    eor #$FF
-    adc #1
-    sta ballDirRow
-@noBounceY:
-    sta ballRow
-
+    beq @checkLeftEdge // if zero we move to the left
+    @checkRightEdge:
+      // check if we reached the right edge
+      lda ballCol
+      clc // needed after lda?
+      adc #1
+      cmp #SCREEN_WIDTH // do we bounce?
+      bcc @moveRight
+      // change direction, set to zero
+      dec ballDirCol
+      // eor #1
+      // sta ballDirCol
+      @moveRight:
+        inc ballCol
+        bcc @draw
+    @checkLeftEdge:
+      lda ballCol
+      // check if we reached the left edge
+      cmp #0 // do we bounce?
+      bne moveLeft
+      sec // set carry for substraction
+      sbc #1 // substract one from accumulator
+      inc ballDirCol // change direction, set to 1
+      @moveLeft:
+        dec ballCol
+    @draw:
     // draw using DrawChar macro
-    lda ballCol
-    sta charCol
-    lda ballRow
-    sta charRow
-    lda charCode
+
+    lda #2
     sta charNr
     lda ballColor
     sta charColor
+    lda ballCol
+    sta charCol
     jsr CHARACTER.drawChar
 }
 

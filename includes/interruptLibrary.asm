@@ -64,7 +64,7 @@ INTERRUPT:
 		lda INTERRUPT_STATUS
 		ora #%00000001 							// Acknowledge raster interrupt
 		sta INTERRUPT_STATUS
-    UpdateBall(ballCol,ballRow,ballDirCol,ballDirRow,ballColor,$41)
+    UpdateBall(ballCol,ballRow,ballDirCol,ballDirRow,ballColor)
 		
 		jmp INTERRUPT_RETURN					// KERNAL interrupt return routine
 }
