@@ -137,7 +137,7 @@ charDirCol: .byte 0
 .macro UpdateBall(ballCol,ballRow,ballDirCol,ballDirRow,ballColor)
 {
     // remove current character
-    lda #1
+    lda #$20
     sta charNr
     jsr CHARACTER.drawChar
 
@@ -160,7 +160,7 @@ charDirCol: .byte 0
     @checkLeftEdge:
       lda ballCol
       // check if we reached the left edge
-      cmp #0 // do we bounce?
+      cmp #1 // do we bounce?
       bne moveLeft
       sec // set carry for substraction
       sbc #1 // substract one from accumulator
@@ -170,7 +170,7 @@ charDirCol: .byte 0
     @draw:
     // draw using DrawChar macro
 
-    lda #2
+    lda #$D1
     sta charNr
     lda ballColor
     sta charColor

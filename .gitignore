@@ -6,7 +6,8 @@
 *.dbg
 *.prg
 *.sym
+*.d64
 *.vs
 
 bin
-
+build
