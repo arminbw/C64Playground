@@ -29,7 +29,7 @@ INTERRUPT:
 		lda SCREEN_CONTROL_1
 		and #%01111111							// Clear bit 7 since we are not using raster interrupts
 		sta SCREEN_CONTROL_1					// past raster line 255
-
+  
 		lda #250								// Raster line to trigger a raster interrupt
 		sta CURRENT_RASTER_LINE
 
@@ -59,12 +59,11 @@ INTERRUPT:
 		sta INTERRUPT_CONTROL
 		rts
 
-
 	irq:
 		lda INTERRUPT_STATUS
 		ora #%00000001 							// Acknowledge raster interrupt
 		sta INTERRUPT_STATUS
     UpdateBall(ballCol,ballRow,ballDirCol,ballDirRow,ballColor)
-		
+    UpdateFrameCounter()
 		jmp INTERRUPT_RETURN					// KERNAL interrupt return routine
 }

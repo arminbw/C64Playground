@@ -1,4 +1,4 @@
-.label ZERO_PAGE_ADDRESS    = $0020
+.label ZERO_PAGE_ADDRESS    = $0020 // we got 224 bytes
 .label GAME_CODE_ADDRESS    = $0810
 .label VARIABLES_ADDRESS    = $0c00
 .label TABLES_ADDRESS       = $4000
@@ -16,7 +16,8 @@
 .label ballDirRow      = ZERO_PAGE_ADDRESS + 8
 .label ballColTemp = ZERO_PAGE_ADDRESS + 9 
 .label ballRowTemp = ZERO_PAGE_ADDRESS + 10
-
+.label frameCounter = ZERO_PAGE_ADDRESS + 11
+.label frameCounterCol = ZERO_PAGE_ADDRESS + 12
 
 // screen constants
 .label SCREEN_RAM = $0400

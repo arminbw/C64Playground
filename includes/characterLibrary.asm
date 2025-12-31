@@ -113,6 +113,7 @@ Row_Color_HI:
 .byte >(SCREEN_COLOR_RAM + (SCREEN_WIDTH * 23))
 .byte >(SCREEN_COLOR_RAM + (SCREEN_WIDTH * 24))
 
+// Todo: use zero page?
 charNr: .byte 1
 charRow: .byte 0
 charCol: .byte 0
@@ -121,7 +122,7 @@ charDirCol: .byte 0
 
 .macro DrawChar(char,row,col,color)
 {
-  // store everything into the char variables
+  // store everything in char variables
 	lda #char
 	sta charNr
 	lda #row
@@ -139,9 +140,30 @@ charDirCol: .byte 0
     // remove current character
     lda #$20
     sta charNr
+    lda ballRow
+    sta charRow
+    lda ballCol
+    sta charCol
     jsr CHARACTER.drawChar
 
     lda ballDirCol
+    // idea C: the right screen has 3 parts for 3 voices
+    // each shows a track wound up, of different length
+    // and there are reloading after a while, also changing sounds
+    // maybe we just update the part of the screen that contains the tracks?
+
+    // idea D: multi-frame character motion with buffered swap 
+    // We don't have to be fast. We only check all positions every - example - 5 frames.
+    // * We animate movement by changing the characters every frame
+    // * We update the screen buffer in 4 frames, step by step.
+    // * In the fifth step we change the variable of the screen buffer.
+    // How to implement in tiny steps:
+    // * add interrupt counter
+    // * test character animation
+    // ** Copy several charsets to a different RAM banks and toggle $D018
+    // ** Consider overlapping charsets?
+    // * add a second screen buffer
+
     beq @checkLeftEdge // if zero we move to the left
     @checkRightEdge:
       // check if we reached the right edge
@@ -152,8 +174,6 @@ charDirCol: .byte 0
       bcc @moveRight
       // change direction, set to zero
       dec ballDirCol
-      // eor #1
-      // sta ballDirCol
       @moveRight:
         inc ballCol
         bcc @draw
@@ -177,6 +197,44 @@ charDirCol: .byte 0
     lda ballCol
     sta charCol
     jsr CHARACTER.drawChar
+}
+
+.macro UpdateFrameCounter() {
+    // count frames
+    lda frameCounter
+    // move a character every 5th frame to evaluate the reduced speed
+    cmp #5
+    beq move
+    inc frameCounter
+    jmp doNothing
+
+    @move:
+      lda #0 // reset counter
+      sta frameCounter
+      // remove character
+      lda #$20
+      sta charNr
+      lda #1
+      sta charColor
+      lda #3
+      sta charRow
+      lda frameCounterCol
+      sta charCol
+      jsr CHARACTER.drawChar
+      // draw character again, but move on col to the right
+      lda #$D1
+      sta charNr
+      lda #1
+      sta charColor
+      lda #3
+      sta charRow
+      inc frameCounterCol
+      lda frameCounterCol
+      sta charCol
+      jsr CHARACTER.drawChar
+      jmp doNothing
+
+    @doNothing:
 }
 
 CHARACTER:
